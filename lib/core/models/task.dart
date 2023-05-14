@@ -7,33 +7,20 @@ class Task {
   String title;
   String description;
   String text;
-  int done;
+  int status;
+  DateTime criadoEm;
+  DateTime? atualizadoEm;
+
   Task({
     this.id,
     required this.priority,
     required this.title,
     required this.description,
     required this.text,
-    required this.done,
+    required this.status,
+    required this.criadoEm,
+    this.atualizadoEm,
   });
-
-  Task copyWith({
-    int? id,
-    int? priority,
-    String? title,
-    String? description,
-    String? text,
-    int? done,
-  }) {
-    return Task(
-      id: id ?? this.id,
-      priority: priority ?? this.priority,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      text: text ?? this.text,
-      done: done ?? this.done,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -42,7 +29,9 @@ class Task {
       'title': title,
       'description': description,
       'text': text,
-      'done': done,
+      'status': status,
+      'criadoEm': criadoEm.toString(),
+      'atualizadoEm': atualizadoEm?.toString(),
     };
   }
 
@@ -53,7 +42,11 @@ class Task {
       title: map['title'] as String,
       description: map['description'] as String,
       text: map['text'] as String,
-      done: map['done'] as int,
+      status: map['status'] as int,
+      criadoEm: DateTime.parse(map['criadoEm']),
+      atualizadoEm: map['atualizadoEm'] != null
+          ? DateTime.parse(map['atualizadoEm'])
+          : null,
     );
   }
 
@@ -64,6 +57,6 @@ class Task {
 
   @override
   String toString() {
-    return 'Task(id: $id, priority: $priority, title: $title, description: $description, text: $text, done: $done)';
+    return 'Task(id: $id, priority: $priority, title: $title, description: $description, text: $text, status: $status, criadoEm: $criadoEm, atualizadoEm: $atualizadoEm)';
   }
 }

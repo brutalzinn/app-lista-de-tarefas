@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_notepad/core/database_helper.dart';
 import 'package:flutter_app_notepad/core/models/task.dart';
+import 'package:flutter_app_notepad/core/utils/widget_status_utils.dart';
 
 class EditNoteView extends StatefulWidget {
   Task task;
-  bool done = false;
-
   final TextEditingController textoController = TextEditingController();
   final TextEditingController prioridadeController = TextEditingController();
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController descricaoController = TextEditingController();
+  List<bool> statusTarefa = [false, false, false];
+
   EditNoteView({super.key, required this.task}) {
     textoController.text = task.text;
     prioridadeController.text = task.priority.toString();
     tituloController.text = task.title;
     descricaoController.text = task.description;
-    done = task.done == 1 ? true : false;
+    statusTarefa = WidgetStatusUtils.obterStatusPorIndex(task.status);
   }
 
   @override
@@ -36,10 +37,12 @@ class _EditNoteViewState extends State<EditNoteView> {
 
   @override
   Widget build(BuildContext context) {
+    final List<bool> statusTarefa = widget.statusTarefa;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Tarefa'),
+        title: Text('Editando ${widget.task.title}'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,13 +94,26 @@ class _EditNoteViewState extends State<EditNoteView> {
                 ], //
                 keyboardType: TextInputType.number),
           ),
-          Switch(
-            value: widget.done,
-            onChanged: (bool value) {
+          ToggleButtons(
+            isSelected: statusTarefa,
+            onPressed: (int index) {
               setState(() {
-                widget.done = value;
+                for (int buttonIndex = 0;
+                    buttonIndex < statusTarefa.length;
+                    buttonIndex++) {
+                  if (buttonIndex == index) {
+                    statusTarefa[buttonIndex] = true;
+                  } else {
+                    statusTarefa[buttonIndex] = false;
+                  }
+                }
               });
             },
+            children: const <Widget>[
+              Icon(Icons.done),
+              Icon(Icons.pending),
+              Icon(Icons.cancel),
+            ],
           ),
         ],
       ),
@@ -121,7 +137,8 @@ class _EditNoteViewState extends State<EditNoteView> {
               currentTask.priority =
                   int.parse(widget.prioridadeController.text);
               currentTask.description = widget.descricaoController.text;
-              currentTask.done = widget.done ? 1 : 0;
+              currentTask.status = WidgetStatusUtils.obterStatus(statusTarefa);
+              currentTask.atualizadoEm = DateTime.now();
               DatabaseHelper().updateTask(currentTask);
               Navigator.pop(context);
             },

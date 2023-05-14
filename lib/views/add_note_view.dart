@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_notepad/core/database_helper.dart';
 import 'package:flutter_app_notepad/core/models/task.dart';
+import 'package:flutter_app_notepad/core/utils/widget_status_utils.dart';
 
 class AddNoteView extends StatefulWidget {
   AddNoteView({super.key});
@@ -9,7 +10,7 @@ class AddNoteView extends StatefulWidget {
   final TextEditingController prioridadeController = TextEditingController();
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController descricaoController = TextEditingController();
-  bool done = false;
+  List<bool> statusTarefa = [false, false, false];
   @override
   State<AddNoteView> createState() => _AddNoteViewState();
 }
@@ -27,6 +28,7 @@ class _AddNoteViewState extends State<AddNoteView> {
 
   @override
   Widget build(BuildContext context) {
+    final List<bool> statusTarefa = widget.statusTarefa;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -82,13 +84,26 @@ class _AddNoteViewState extends State<AddNoteView> {
                 ], //
                 keyboardType: TextInputType.number),
           ),
-          Switch(
-            value: widget.done,
-            onChanged: (bool value) {
+          ToggleButtons(
+            isSelected: statusTarefa,
+            onPressed: (int index) {
               setState(() {
-                widget.done = value;
+                for (int buttonIndex = 0;
+                    buttonIndex < statusTarefa.length;
+                    buttonIndex++) {
+                  if (buttonIndex == index) {
+                    statusTarefa[buttonIndex] = true;
+                  } else {
+                    statusTarefa[buttonIndex] = false;
+                  }
+                }
               });
             },
+            children: const <Widget>[
+              Icon(Icons.done),
+              Icon(Icons.pending),
+              Icon(Icons.cancel),
+            ],
           ),
         ],
       ),
@@ -111,7 +126,8 @@ class _AddNoteViewState extends State<AddNoteView> {
                   text: widget.textoController.text,
                   priority: int.parse(widget.prioridadeController.text),
                   description: widget.descricaoController.text,
-                  done: widget.done ? 1 : 0);
+                  criadoEm: DateTime.now(),
+                  status: WidgetStatusUtils.obterStatus(statusTarefa));
               DatabaseHelper().addNewTask(task);
               Navigator.pop(context);
             },

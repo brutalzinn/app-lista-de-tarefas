@@ -29,7 +29,9 @@ class DatabaseHelper {
           "title" text NOT NULL,
           "description" varchar(255) NOT NULL,
           "priority" int default 0,
-          "done" int default 0
+          "status" int default 0,
+          "criadoEm" text NOT NULL,
+          "atualizadoEm" text default NULL
         );""";
       await SQLiteWrapper().execute(sql);
     });
@@ -45,7 +47,7 @@ class DatabaseHelper {
   }
 
   void toggleDone(Task task) async {
-    task.done = task.done == 0 ? 1 : 0;
+    task.status = task.status == 0 ? 1 : 0;
     await SQLiteWrapper().update(task.toMap(), "tasks", keys: ["id"]);
   }
 
@@ -56,5 +58,12 @@ class DatabaseHelper {
   Stream getTasks() {
     return SQLiteWrapper()
         .watch("SELECT * FROM tasks", fromMap: Task.fromMap, tables: ["tasks"]);
+  }
+
+  Stream getTasksByPriorityAndStatus() {
+    return SQLiteWrapper().watch(
+        "SELECT * FROM tasks ORDER BY priority DESC, status DESC",
+        fromMap: Task.fromMap,
+        tables: ["tasks"]);
   }
 }
