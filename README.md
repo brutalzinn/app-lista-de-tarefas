@@ -4,11 +4,11 @@ A test project to develop a UI application to create a task and defines a priori
 
 # Planned resources
 
-- Multi Languge system
+- Multi language system
 - Markdown support to description
 - PDF Export to easily share the task info
 - Integration with Miro API
-- Integration with IFTTT
+- Integration with IFTTT API
 # Home screen
 
 ![alt text](docs/tela_inicial.png "Home screen")
